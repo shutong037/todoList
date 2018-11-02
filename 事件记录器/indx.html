@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>工作计划完成记录</title>
+    <style type="text/css">
+        *{margin: 0;padding: 0;}
+        h2{width:500px;margin:0 auto;padding: 10px;text-shadow:1px 1px 1px #6f6f6f;color: #fe0c34;padding-left: 100px;}
+        .time{width: 600px;height: 25px;margin: 0 auto;color: #60b15c;}
+        .ipt_info {width:600px;margin:20px auto;text-align: left;}
+        .ipt_info input {width:335px;height:40px;line-height:40px;padding-left:5px;font-size:14px;border-radius:10px;outline:0;border:1px solid #9a9a9a;box-shadow:3px 3px 5px rgba(0,0,0,0.3);}
+        .ipt_info button {width:100px;height:40px;line-height:40px;background-color:teal;color:#ffffff;cursor:pointer;margin-left:30px;border-radius:3px;border:0;outline:0;font-size:16px;box-shadow:3px 3px 5px rgba(0,0,0,0.3);}
+        .plan_list {width:500px;margin:0 auto;font-size:16px;}
+        ul li{cursor: pointer;list-style: none;}
+    </style>
+    <script type="text/javascript" src="js/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <h2><span id="year">2018</span>年事件记录表</h2>
+    <p class="time" id="time">当前时间:</p>
+    <div class="ipt_info">
+        <input type="text" v-model="inputVal" placeholder="请输入你想记录的事件">
+        <button @click="headClick">提交</button>
+    </div>
+    <ul class="plan_list">
+        <todo-item v-for="(item,index) of list" :key="index" :content="item" :index="index" @delete="delMsg"></todo-item>
+    </ul>
+</div>
+<script type="text/javascript">
+    //全局组件
+    Vue.component('todo-item',{
+        props:['content','index'],
+        template: "<li @click='delClick' title='点击删除'>{{index}}: {{content}}</li>",
+        methods:{
+            delClick:function () {
+                this.$emit('delete',this.index);
+                alert("恭喜你完成了此项任务！");
+            }
+        }
+    });
+
+
+    //局部组件
+    /*
+      var TodoItem = {
+        template: '<li>item</li>'
+       };
+       components:{
+         'todo-item': TodoItem
+       },
+
+       */
+
+    var vm = new Vue({
+       el:"#app",
+       data:{
+           inputVal:'',
+           list:['去远方流浪']
+       },
+       methods:{
+           headClick:function () {
+               if(this.inputVal){
+                   this.list.push(this.inputVal);
+                   this.inputVal = "";
+               }else{
+                   alert("不能不输入哦！");
+               }
+
+           },
+           delMsg:function (num) {
+               this.list.splice(num,1);
+           }
+       }
+    });
+
+    //获取日期
+    function addTime(){
+        var time = new Date();//获取系统当前时间
+        var year = time.getFullYear();
+        var month = time.getMonth()+1;
+        var date= time.getDate();//系统时间月份中的日
+        var day = time.getDay();//系统时间中的星期值
+        var weeks = ["星期日 ","星期一 ","星期二 ","星期三 ","星期四 ","星期五 ","星期六 "];
+        var week = weeks[day];//显示为星期几
+        var hour = time.getHours();
+        var minutes = time.getMinutes();
+        var seconds = time.getSeconds();
+        if(month<10){
+            month = "0"+month;
+        }
+        if(date<10){
+            date = "0"+date;
+        }
+        if(hour<10){
+            hour = "0"+hour;
+        }
+        if(minutes<10){
+            minutes = "0"+minutes;
+        }
+        if(seconds<10){
+            seconds = "0"+seconds;
+        }
+        document.getElementById("year").innerHTML = year;
+        document.getElementById("time").innerHTML ="当前时间: " +year+"年"+month+"月"+date+"日 "+week+hour+":"+minutes+":"+seconds;
+        setTimeout('addTime()',1000);
+    }
+
+    window.onload = function () {
+        //键盘事件
+        document.onkeyup = function (e) {
+            //如果window.event对象存在，就以此事件对象为准
+            if (window.event){
+                e = window.event;
+            }
+            var code = e.charCode || e.keyCode;
+            if (code == 13) {
+                vm.headClick();
+            }
+        };
+        addTime();
+    }
+
+
+
+</script>
+</body>
+</html>
